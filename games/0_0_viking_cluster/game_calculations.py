@@ -28,6 +28,9 @@ class GameCalculations(Executables):
         exploding_symbols = []
         tile_multipliers = {}
         total_win = 0
+        # Random multipliers only "kick in" after the first winning connection of a
+        # spin (i.e. from the first cascade onward), never on the initial win.
+        mults_active = getattr(self, "mults_active", False)
         for sym in clusters:
             for cluster in clusters[sym]:
                 syms_in_cluster = len(cluster)
@@ -35,7 +38,9 @@ class GameCalculations(Executables):
                     board_mult = 0
                     for positions in cluster:
                         if positions not in tile_multipliers:
-                            tile_multipliers[positions] = get_random_outcome(mult_values)
+                            tile_multipliers[positions] = (
+                                get_random_outcome(mult_values) if mults_active else 0
+                            )
                         board_mult += tile_multipliers[positions]
                     board_mult = max(board_mult, 1)
                     sym_win = config.paytable[(syms_in_cluster, sym)]

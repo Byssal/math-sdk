@@ -12,8 +12,12 @@ class GameState(GameStateOverride):
             self.reset_book()
             self.draw_board()
 
+            # First connection of the spin: no random multipliers yet.
+            self.mults_active = False
             self.get_clusters_update_wins()
             self.emit_tumble_win_events()
+            # From the first cascade onward, random multipliers can land.
+            self.mults_active = True
 
             while self.win_data["totalWin"] > 0 and not (self.wincap_triggered):
                 self.tumble_game_board()
@@ -36,10 +40,13 @@ class GameState(GameStateOverride):
         while self.fs < self.tot_fs:
             self.update_freespin()
             self.draw_board()
-            # Apply game-specific actions (i.e special symbol attributes before or after evaluation)
 
+            # First connection of the free spin: no random multipliers yet.
+            self.mults_active = False
             self.get_clusters_update_wins()
             self.emit_tumble_win_events()
+            self.mults_active = True
+
             while self.win_data["totalWin"] > 0 and not (self.wincap_triggered):
                 self.tumble_game_board()
                 self.get_clusters_update_wins()

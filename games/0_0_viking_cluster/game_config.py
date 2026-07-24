@@ -86,11 +86,12 @@ class GameConfig(Config):
         }
         self.bonus_tier_names = {3: "raid", 4: "expedition", 5: "ragnarok"}
 
-        # Random multiplier that can land on any winning-cluster tile.
-        # Weighted so "no multiplier" (1x) is the common outcome.
+        # Random multiplier that can land on a winning-cluster tile. 0 = "no
+        # multiplier" (the common outcome); values on winning tiles are summed
+        # for the cluster (so most clusters pay x1). Free spins are more generous.
         self.mult_values = {
-            self.basegame_type: {1: 60, 2: 20, 3: 10, 5: 6, 10: 3, 20: 1},
-            self.freegame_type: {1: 40, 2: 25, 3: 15, 5: 10, 10: 7, 20: 3},
+            self.basegame_type: {0: 72, 2: 12, 3: 8, 5: 5, 10: 2, 20: 1},
+            self.freegame_type: {0: 55, 2: 16, 3: 12, 5: 9, 10: 5, 20: 3},
         }
 
         reels = {"BR0": "BR0.csv", "FR0": "FR0.csv", "WCAP": "WCAP.csv"}
