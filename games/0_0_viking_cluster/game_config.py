@@ -26,15 +26,15 @@ class GameConfig(Config):
         self.rtp = 0.9670
         self.construct_paths()
 
-        # Game Dimensions: 5 reels (columns) x 6 rows = 30 cells
-        self.num_reels = 5
+        # Game Dimensions: 6 reels (columns) x 6 rows = 36 cells
+        self.num_reels = 6
         self.num_rows = [6] * self.num_reels
 
         # Board and Symbol Properties.
         # H1-H4: Mjolnir (Thor's hammer), horned helmet, battle axe, rune shield.
         # L1-L4: four rune-stone colors. W: Viking longship (wild). S: Valknut (scatter).
-        # Top tier max (30) matches num_reels*num_rows so a full-board cluster never pays zero.
-        t1, t2, t3, t4 = (5, 5), (6, 8), (9, 14), (15, 30)
+        # Top tier max (36) matches num_reels*num_rows so a full-board cluster never pays zero.
+        t1, t2, t3, t4 = (5, 5), (6, 8), (9, 14), (15, 36)
         pay_group = {
             (t1, "H1"): 6.0,
             (t2, "H1"): 15.0,
