@@ -35,12 +35,21 @@ class GameState(GameStateOverride):
         self.imprint_wins()
 
     def run_freespin(self):
-        # reset_fs_spin resets the grid ONCE here, so multipliers persist across all
-        # free spins (they stack up over the whole bonus).
-        self.reset_fs_spin()
+        self.reset_fs_spin()  # global multiplier starts at 0 (bumped to 1 on spin 1)
+        # Ragnarok (5 scatters) starts each free spin's grid pre-filled at x4.
+        grid_start = (
+            self.config.ragnarok_grid_start if getattr(self, "bonus_type", None) == "ragnarok" else 0
+        )
         while self.fs < self.tot_fs:
             self.update_freespin()
             self.draw_board()
+
+            # Top global multiplier grows every free spin (x1, x2, x3, ...).
+            self.update_global_mult()
+            # Fresh grid each free spin; Ragnarok gives a x4 head start on all tiles.
+            self.reset_grid_mults(grid_start)
+            if grid_start > 0:
+                self.emit_grid()
 
             self.get_clusters_update_wins()
             self.emit_tumble_win_events()

@@ -74,12 +74,16 @@ class GameConfig(Config):
         self.include_padding = True
         self.special_symbols = {"wild": ["W"], "scatter": ["S"]}
 
-        # 3-tier scatter bonus: 3 = Raid (common), 4 = Expedition (better odds),
-        # 5 = Ragnarok (ultra rare, huge bonus). Keys double as free-spin counts.
+        # 3-tier scatter bonus (keys = scatter count -> free-spin count):
+        #   3 = Raid: 8 spins, grid starts at 0
+        #   4 = Expedition: 12 spins (more), grid starts at 0
+        #   5 = Ragnarok: 12 spins (same as 4) but the multiplier grid starts at x4
+        # The grid-start bonus is applied in gamestate.run_freespin via bonus_type.
         self.freespin_triggers = {
-            self.basegame_type: {3: 8, 4: 10, 5: 15},
-            self.freegame_type: {3: 5, 4: 8, 5: 12},
+            self.basegame_type: {3: 8, 4: 12, 5: 12},
+            self.freegame_type: {3: 4, 4: 6, 5: 6},
         }
+        self.ragnarok_grid_start = 4
         self.anticipation_triggers = {
             self.basegame_type: min(self.freespin_triggers[self.basegame_type].keys()) - 1,
             self.freegame_type: min(self.freespin_triggers[self.freegame_type].keys()) - 1,

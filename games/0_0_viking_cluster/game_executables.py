@@ -7,11 +7,16 @@ from src.events.events import update_freespin_event
 class GameExecutables(GameCalculations):
     """Game dependent grouped functions."""
 
-    def reset_grid_mults(self):
-        """Initialize all grid position multipliers to 0."""
+    def reset_grid_mults(self, start_value: int = 0):
+        """Initialize all grid position multipliers to start_value (0 normally,
+        4 for the Ragnarok tier)."""
         self.position_multipliers = [
-            [0 for _ in range(self.config.num_rows[reel])] for reel in range(self.config.num_reels)
+            [start_value for _ in range(self.config.num_rows[reel])] for reel in range(self.config.num_reels)
         ]
+
+    def emit_grid(self):
+        """Send the current grid to the frontend (used to show a pre-filled grid)."""
+        update_grid_mult_event(self)
 
     def update_grid_mults(self):
         """A winning cluster raises the multiplier on its tiles: 0 -> 1 on the first

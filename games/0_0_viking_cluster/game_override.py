@@ -14,14 +14,15 @@ class GameStateOverride(GameExecutables):
         # Reset parameters relevant to local game only
         self.tumble_win = 0
         self.bonus_type = None
-        # Base game: the multiplier grid is fresh every spin.
-        self.reset_grid_mults()
+        # Base game: no global multiplier, fresh grid each spin.
+        self.global_multiplier = 1
+        self.reset_grid_mults(0)
 
     def reset_fs_spin(self):
-        # Free spins: reset the grid ONCE at the start of the bonus so multipliers
-        # persist (accumulate) across all free spins.
+        # Bonus start: the top global multiplier begins at 0 and is bumped to 1 on
+        # the first free spin, then +1 each spin (so the "x1" box actually grows).
         super().reset_fs_spin()
-        self.reset_grid_mults()
+        self.global_multiplier = 0
 
     def assign_special_sym_function(self):
         pass
