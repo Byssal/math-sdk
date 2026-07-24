@@ -8,21 +8,20 @@ class GameState(GameStateOverride):
         self.reset_seed(sim)
         self.repeat = True
         while self.repeat:
-            # Reset simulation variables and draw a new board based on the betmode criteria.
+            # reset_book resets the multiplier grid, so in the base game it is fresh each spin.
             self.reset_book()
             self.draw_board()
 
-            # First connection of the spin: no random multipliers yet.
-            self.mults_active = False
             self.get_clusters_update_wins()
             self.emit_tumble_win_events()
-            # From the first cascade onward, random multipliers can land.
-            self.mults_active = True
+            # A winning connection raises the grid multipliers for the NEXT connections.
+            self.update_grid_mults()
 
             while self.win_data["totalWin"] > 0 and not (self.wincap_triggered):
                 self.tumble_game_board()
                 self.get_clusters_update_wins()
                 self.emit_tumble_win_events()
+                self.update_grid_mults()
 
             self.set_end_tumble_event()
             self.win_manager.update_gametype_wins(self.gametype)
@@ -36,21 +35,22 @@ class GameState(GameStateOverride):
         self.imprint_wins()
 
     def run_freespin(self):
+        # reset_fs_spin resets the grid ONCE here, so multipliers persist across all
+        # free spins (they stack up over the whole bonus).
         self.reset_fs_spin()
         while self.fs < self.tot_fs:
             self.update_freespin()
             self.draw_board()
 
-            # First connection of the free spin: no random multipliers yet.
-            self.mults_active = False
             self.get_clusters_update_wins()
             self.emit_tumble_win_events()
-            self.mults_active = True
+            self.update_grid_mults()
 
             while self.win_data["totalWin"] > 0 and not (self.wincap_triggered):
                 self.tumble_game_board()
                 self.get_clusters_update_wins()
                 self.emit_tumble_win_events()
+                self.update_grid_mults()
 
             self.set_end_tumble_event()
             self.win_manager.update_gametype_wins(self.gametype)

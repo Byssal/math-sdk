@@ -1,47 +1,35 @@
 from src.executables.executables import Executables
 from src.calculations.cluster import Cluster
 from src.calculations.board import Board
-from src.calculations.statistics import get_random_outcome
 from src.config.config import Config
 
 
 class GameCalculations(Executables):
     """
-    Overrides evaluate_clusters() to draw a random multiplier (rune-stone) for
-    each tile that takes part in a winning cluster, instead of a static grid.
+    Overrides evaluate_clusters() to account for the accumulating multiplier grid:
+    a cluster's win is multiplied by the sum of the grid multipliers on its tiles.
     """
 
-    def evaluate_clusters_with_random_mult(
+    def evaluate_clusters_with_grid(
         self,
         config: Config,
         board: Board,
         clusters: dict,
-        mult_values: dict,
+        pos_mult_grid: list,
         global_multiplier: int = 1,
         return_data: dict = {"totalWin": 0, "wins": []},
     ) -> type:
-        """
-        Determine payout amount from cluster, drawing a random multiplier value
-        for each winning tile (cached per-position so a tile shared by more than
-        one cluster keeps a single drawn value within this evaluation pass).
-        """
+        """Determine payout, multiplying each cluster by the summed grid multiplier
+        on its winning tiles (min 1) and the global multiplier."""
         exploding_symbols = []
-        tile_multipliers = {}
         total_win = 0
-        # Random multipliers only "kick in" after the first winning connection of a
-        # spin (i.e. from the first cascade onward), never on the initial win.
-        mults_active = getattr(self, "mults_active", False)
         for sym in clusters:
             for cluster in clusters[sym]:
                 syms_in_cluster = len(cluster)
                 if (syms_in_cluster, sym) in config.paytable:
                     board_mult = 0
                     for positions in cluster:
-                        if positions not in tile_multipliers:
-                            tile_multipliers[positions] = (
-                                get_random_outcome(mult_values) if mults_active else 0
-                            )
-                        board_mult += tile_multipliers[positions]
+                        board_mult += pos_mult_grid[positions[0]][positions[1]]
                     board_mult = max(board_mult, 1)
                     sym_win = config.paytable[(syms_in_cluster, sym)]
                     symwin_mult = sym_win * board_mult * global_multiplier
@@ -66,17 +54,8 @@ class GameCalculations(Executables):
 
                     for positions in cluster:
                         board[positions[0]][positions[1]].explode = True
-                        if {
-                            "reel": positions[0],
-                            "row": positions[1],
-                        } not in exploding_symbols:
+                        if {"reel": positions[0], "row": positions[1]} not in exploding_symbols:
                             exploding_symbols.append({"reel": positions[0], "row": positions[1]})
 
         return_data["totalWin"] += total_win
-        return_data["tileMultipliers"] = [
-            {"reel": pos[0], "row": pos[1], "value": value}
-            for pos, value in tile_multipliers.items()
-            if value > 1
-        ]
-
         return board, return_data
