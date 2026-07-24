@@ -26,9 +26,9 @@ class GameConfig(Config):
         self.rtp = 0.9670
         self.construct_paths()
 
-        # Game Dimensions: 6 reels x 5 rows = 30 cells
-        self.num_reels = 6
-        self.num_rows = [5] * self.num_reels
+        # Game Dimensions: 5 reels (columns) x 6 rows = 30 cells
+        self.num_reels = 5
+        self.num_rows = [6] * self.num_reels
 
         # Board and Symbol Properties.
         # H1-H4: Mjolnir (Thor's hammer), horned helmet, battle axe, rune shield.
